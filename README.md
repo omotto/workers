@@ -34,23 +34,12 @@ import "github.com/omotto/workers"
 	if id, err = pool.AddWorker(true, func (string) int { return 0 }, "pepe"); err != nil {
 		panic(err)
 	}
-    ids = append(ids, id)
     ...
 
     // Execute pool of workers
     if err = pool.Run(ctx); err == nil {
-	    // Check results
-        for _, id := range(ids) {
-            // Get executed worker result
-            if results, err := pool.GetResults(id); err == nil {
-				r := results[0].Interface()
-                // Check result type
-				switch r.(type) {
-					case int:
-						value = r.(int)
-					default:
-						errors.New("invalid type")
-				}
-			}
+        // Get executed worker result
+        if results, err := pool.GetResults(id); err == nil {
+		    fmt.Println(results[0].(int))
         }
     }

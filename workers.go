@@ -62,10 +62,14 @@ func (c *Pool) AddWorker(wait bool, function interface{}, funcParams ...interfac
 }
 
 // GetResults get worker result by its id
-func (c *Pool) GetResults(uuid string) ([]reflect.Value, error) {
+func (c *Pool) GetResults(uuid string) ([]interface{}, error) {
+	var ret []interface{}
 	for _, w := range c.workers {
 		if w.uuid == uuid {
-			return w.funcReturns, nil
+			for _, funcReturn := range w.funcReturns {
+				ret = append(ret, funcReturn.Interface())
+			}
+			return ret, nil
 		}
 	}
 	return nil, errors.New("uuid not found")
