@@ -12,25 +12,25 @@ import (
 )
 
 type worker struct {
-	uuid			string
-	function 		interface{}
-	funcParams		[]interface{}
-	funcReturns		[]interface{}
-	wait 			bool
+	uuid        string
+	function    interface{}
+	funcParams  []interface{}
+	funcReturns []interface{}
+	wait        bool
 }
 
 // Pool Struct
 type Pool struct {
-	lastIndex		int64				// Last inserted job index
-	running			bool				// Scheduler status running (true) or stopped
-	workers			[]worker			// Slice of jobs to be executed
-	wg 				sync.WaitGroup		// WaitGroup
+	lastIndex int64          // Last inserted job index
+	running   bool           // Scheduler status running (true) or stopped
+	workers   []worker       // Slice of jobs to be executed
+	wg        sync.WaitGroup // WaitGroup
 }
 
 // New Pool constructor
 func New() *Pool {
 	return &Pool{
-		running: false,
+		running:   false,
 		lastIndex: 0,
 	}
 }
@@ -39,22 +39,30 @@ func New() *Pool {
 func (c *Pool) AddWorker(wait bool, function interface{}, funcParams ...interface{}) (uuid string, err error) {
 	// Check input parameters
 	// -- Check if param function contains a function
-	if function == nil || reflect.ValueOf(function).Kind() != reflect.Func { return uuid, fmt.Errorf("invalid function parameter") }
+	if function == nil || reflect.ValueOf(function).Kind() != reflect.Func {
+		return uuid, fmt.Errorf("invalid function parameter")
+	}
 	// -- Check number of params
-	if len(funcParams) != reflect.TypeOf(function).NumIn() { return uuid, fmt.Errorf("number of function params and number of provided params doesn't match") }
+	if len(funcParams) != reflect.TypeOf(function).NumIn() {
+		return uuid, fmt.Errorf("number of function params and number of provided params doesn't match")
+	}
 	// -- Check input params type belongs to function params type
 	for i := 0; i < reflect.TypeOf(function).NumIn(); i++ {
 		functionParam := reflect.TypeOf(function).In(i)
 		inputParam := reflect.TypeOf(funcParams[i])
 		if functionParam != inputParam {
-			if functionParam.Kind() != reflect.Interface { return uuid, fmt.Errorf(fmt.Sprintf("param[%d] must be be `%s` not `%s`", i, functionParam, inputParam)) }
-			if !inputParam.Implements(functionParam) { return uuid, fmt.Errorf(fmt.Sprintf("param[%d] of type `%s` doesn't implement interface `%s`", i, functionParam, inputParam)) }
+			if functionParam.Kind() != reflect.Interface {
+				return uuid, fmt.Errorf(fmt.Sprintf("param[%d] must be be `%s` not `%s`", i, functionParam, inputParam))
+			}
+			if !inputParam.Implements(functionParam) {
+				return uuid, fmt.Errorf(fmt.Sprintf("param[%d] of type `%s` doesn't implement interface `%s`", i, functionParam, inputParam))
+			}
 		}
 	}
 	// Add new job
 	uuid = strconv.FormatInt(time.Now().UnixNano(), 16) + strconv.FormatInt(c.lastIndex, 16)
 	c.lastIndex++
-	newWorker := worker { uuid: uuid, function: function, funcParams: funcParams, wait: wait }
+	newWorker := worker{uuid: uuid, function: function, funcParams: funcParams, wait: wait}
 	if c.running == false {
 		c.workers = append(c.workers, newWorker)
 	}
@@ -100,7 +108,9 @@ func (c *Pool) Run(ctx context.Context) error {
 
 func (c *Pool) execWorker(w *worker) {
 	defer func() {
-		if r := recover(); r != nil { log.Println("worker func ", w.uuid, " error ", r) }
+		if r := recover(); r != nil {
+			log.Println("worker func ", w.uuid, " error ", r)
+		}
 	}()
 	args := make([]reflect.Value, len(w.funcParams))
 	for i, param := range w.funcParams {
