@@ -33,10 +33,9 @@ Usage
 	if id, err = pool.AddWorker(true, func (u user) int { fmt.Println(u.Name); return u.ID }, user{ID:10, Name: "pepe"}); err == nil {
 		if err = pool.Run(ctx); err == nil {
 			if results, err := pool.GetResults(id); err == nil {
-				r := results[0].Interface()
-				switch r.(type) {
+				switch results[0].(type) {
 					case int:
-						value = r.(int)
+						value = results[0].(int)
 					default:
 						errors.New("invalid type")
 				}
