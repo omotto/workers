@@ -15,7 +15,7 @@ type worker struct {
 	uuid			string
 	function 		interface{}
 	funcParams		[]interface{}
-	funcReturns		[]reflect.Value
+	funcReturns		[]interface{}
 	wait 			bool
 }
 
@@ -63,13 +63,9 @@ func (c *Pool) AddWorker(wait bool, function interface{}, funcParams ...interfac
 
 // GetResults get worker result by its id
 func (c *Pool) GetResults(uuid string) ([]interface{}, error) {
-	var ret []interface{}
 	for _, w := range c.workers {
 		if w.uuid == uuid {
-			for _, funcReturn := range w.funcReturns {
-				ret = append(ret, funcReturn.Interface())
-			}
-			return ret, nil
+			return w.funcReturns, nil
 		}
 	}
 	return nil, errors.New("uuid not found")
@@ -110,7 +106,10 @@ func (c *Pool) execWorker(w *worker) {
 	for i, param := range w.funcParams {
 		args[i] = reflect.ValueOf(param)
 	}
-	w.funcReturns = reflect.ValueOf(w.function).Call(args)
+	funcReturns := reflect.ValueOf(w.function).Call(args)
+	for _, funcReturn := range funcReturns {
+		w.funcReturns = append(w.funcReturns, funcReturn.Interface())
+	}
 	if w.wait {
 		c.wg.Done()
 	}
