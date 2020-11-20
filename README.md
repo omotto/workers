@@ -1,6 +1,8 @@
 [![GoDoc](http://godoc.org/github.com/omotto/workers?status.png)](http://godoc.org/github.com/omotto/workers)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/omotto/workers)](https://pkg.go.dev/github.com/omotto/workers)
 [![Build Status](https://travis-ci.com/omotto/workers.svg?branch=main)](https://travis-ci.com/omotto/workers)
 [![Coverage Status](https://coveralls.io/repos/github/omotto/workers/badge.svg)](https://coveralls.io/github/omotto/workers)
+[![Go Report Card](https://goreportcard.com/badge/github.com/omotto/workers)](https://goreportcard.com/report/github.com/omotto/workers)
 
 # Pool of Workers
 
