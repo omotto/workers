@@ -76,6 +76,13 @@ func TestPoolError(t *testing.T) {
 		t.Error(err)
 		return
 	}
+	if _, err = pool.AddWorker(true, func() {
+		panic("force panic")
+	}); err != nil {
+		t.Error(err)
+		return
+	}
+
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(4*time.Second))
 	defer cancel()
 	if err = pool.Run(ctx); err == nil {
@@ -110,5 +117,7 @@ func TestPoolError(t *testing.T) {
 				t.Error(err)
 			}
 		}
+	} else{
+		t.Error(err)
 	}
 }

@@ -110,6 +110,7 @@ func (c *Pool) execWorker(w *worker) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Println("worker func ", w.uuid, " error ", r)
+			c.wg.Done()
 		}
 	}()
 	args := make([]reflect.Value, len(w.funcParams))
